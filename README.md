@@ -183,7 +183,9 @@ MIT License
 
 ## 🤝 贡献
 
-![weixin](https://github.com/user-attachments/assets/39dc3512-f7da-44d7-92e7-8e3009e78351)
+<img src="https://github.com/user-attachments/assets/39dc3512-f7da-44d7-92e7-8e3009e78351" style="width:200px; height:auto;">
+
+<img src="https://github.com/user-attachments/assets/aa895f4a-690c-409b-b519-f47676f1007d" style="width:200px; height:auto;">
 
 
 欢迎提交 Issue 和 Pull Request！
