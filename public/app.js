@@ -44,7 +44,31 @@ function initTabs() {
       tabPanes.forEach(p => p.classList.remove('active'));
       
       btn.classList.add('active');
-      document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+      const targetPane = document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+      if (targetPane) {
+        targetPane.classList.add('active');
+      }
+      
+      if (tab === 'chart') {
+        if (currentStockCode) {
+          loadChart(currentStockCode);
+        } else {
+          const chartContainer = document.getElementById('chartContainer');
+          if (chartContainer) {
+            chartContainer.innerHTML = '<div class="info-placeholder">请先分析一只股票</div>';
+          }
+        }
+      }
+      if (tab === 'info') {
+        if (currentStockCode) {
+          loadStockInfo(currentStockCode);
+        } else {
+          const stockInfoEl = document.getElementById('stockInfo');
+          if (stockInfoEl) {
+            stockInfoEl.innerHTML = '<div class="info-placeholder">请先分析一只股票</div>';
+          }
+        }
+      }
     });
   });
 }
@@ -333,7 +357,8 @@ function newSession() {
 }
 
 function loadChart(stockCode) {
-  const chartFrame = document.getElementById('chartFrame');
+  const chartContainer = document.getElementById('chartContainer');
+  if (!chartContainer) return;
   
   const code = stockCode.toLowerCase();
   let url = '';
@@ -361,7 +386,7 @@ function loadChart(stockCode) {
     }
   }
   
-  chartFrame.src = url;
+  chartContainer.innerHTML = `<iframe id="chartFrame" src="${url}" frameborder="0" width="100%" height="100%" style="border:none;"></iframe>`;
 }
 
 async function loadStockInfo(stockCode) {
@@ -743,7 +768,7 @@ async function sendChatMessage() {
     const aiMessageDiv = document.createElement('div');
     aiMessageDiv.className = 'chat-message ai';
     aiMessageDiv.innerHTML = '<div class="message-bubble" id="aiResponse"></div>';
-    outputArea.appendChild(aiMessageDiv);
+    chatMessages.appendChild(aiMessageDiv);
     const aiContent = aiMessageDiv.querySelector('.message-bubble');
     
     while (true) {
@@ -867,7 +892,11 @@ function renderMarkdown(text, element) {
   html = html.replace(/(<\/pre>)<\/p>/g, '$1');
   
   element.innerHTML = html;
-  element.scrollTop = element.scrollHeight;
+  
+  const chatMessages = document.getElementById('chatMessages');
+  if (chatMessages) {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
 }
 
 function escapeHtml(text) {
