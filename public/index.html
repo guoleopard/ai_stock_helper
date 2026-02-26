@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI股票分析师</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <rect x="2" y="8" width="4" height="16" rx="1" fill="#00d4aa"/>
+          <rect x="8" y="4" width="4" height="24" rx="1" fill="#00d4aa" opacity="0.8"/>
+          <rect x="14" y="10" width="4" height="12" rx="1" fill="#00d4aa" opacity="0.6"/>
+          <rect x="20" y="6" width="4" height="20" rx="1" fill="#00d4aa" opacity="0.4"/>
+          <rect x="26" y="12" width="4" height="8" rx="1" fill="#00d4aa" opacity="0.2"/>
+        </svg>
+      </div>
+      <h1 class="title">AI股票分析师</h1>
+    </div>
+    <button class="settings-btn" id="settingsBtn" title="API设置">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+  </header>
+
+  <main class="main">
+    <aside class="history-sidebar">
+      <div class="history-header">
+        <h2 class="history-title">历史记录</h2>
+        <button class="clear-history-btn" id="clearHistoryBtn" title="清空历史">清空</button>
+      </div>
+      <div class="history-list" id="historyList">
+        <div class="history-empty">暂无历史记录</div>
+      </div>
+    </aside>
+
+    <aside class="sidebar">
+      <div class="config-card">
+        <h2 class="card-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+          API配置
+        </h2>
+        
+        <div class="form-group">
+          <label>AI平台</label>
+          <div class="platform-selector">
+            <button class="platform-btn active" data-platform="deepseek">
+              <span class="platform-icon">◈</span>
+              DeepSeek
+            </button>
+            <button class="platform-btn" data-platform="qwen">
+              <span class="platform-icon">◉</span>
+              阿里千问
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>API Key</label>
+          <input type="password" id="apiKey" class="input" placeholder="请输入API Key">
+        </div>
+
+        <div class="form-group">
+          <label>API URL</label>
+          <input type="text" id="apiUrl" class="input" placeholder="API地址">
+        </div>
+
+        <div class="form-group">
+          <label>模型</label>
+          <input type="text" id="model" class="input" placeholder="模型名称">
+        </div>
+      </div>
+
+      <div class="config-card">
+        <h2 class="card-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+          股票查询
+        </h2>
+
+        <div class="form-group">
+          <label>股票代码</label>
+          <div class="stock-input-group">
+            <select id="exchange" class="select">
+              <option value="auto">自动识别</option>
+              <option value="sh">沪市</option>
+              <option value="sz">深市</option>
+              <option value="bj">北交所</option>
+              <option value="hk">港股</option>
+            </select>
+            <input type="text" id="stockCode" class="input" placeholder="如: 000001">
+          </div>
+        </div>
+
+        <button id="analyzeBtn" class="analyze-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+          开始分析
+        </button>
+      </div>
+    </aside>
+
+    <section class="content">
+      <div class="tab-header">
+        <button class="tab-btn active" data-tab="chat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          AI分析
+        </button>
+        <button class="tab-btn" data-tab="chart">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          K线图
+        </button>
+        <button class="tab-btn" data-tab="info">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          实时行情
+        </button>
+      </div>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="tabChat">
+          <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message" id="welcomeMessage">
+              <div class="welcome-icon">📊</div>
+              <h3>欢迎使用AI股票分析师</h3>
+              <p>请在左侧输入股票代码，点击"开始分析"获取专业分析报告</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane" id="tabChart">
+          <div class="chart-container" id="chartContainer">
+            <iframe id="chartFrame" frameborder="0" width="100%" height="100%"></iframe>
+          </div>
+        </div>
+
+        <div class="tab-pane" id="tabInfo">
+          <div class="stock-info" id="stockInfo">
+            <div class="info-placeholder">暂无股票信息</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <div class="output-header" id="outputHeader" style="display: none;">
+          <span class="stock-label">正在分析:</span>
+          <span class="stock-code" id="displayStockCode">--</span>
+          <span class="status-badge" id="statusBadge">
+            <span class="status-dot"></span>
+            分析中
+          </span>
+        </div>
+        <div class="chat-input-area" id="chatInputArea" style="display: none;">
+          <div class="chat-input-wrapper">
+            <input type="text" id="chatInput" class="chat-input" placeholder="继续追问...">
+            <button class="chat-send-btn" id="chatSendBtn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="settingsModal">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h3>设置</h3>
+        <button class="modal-close" id="modalClose">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-section">
+          <h4 class="setting-title">API配置</h4>
+          <div class="setting-item">
+            <h5>DeepSeek</h5>
+            <p>URL: <code>https://api.deepseek.com/v1/chat/completions</code></p>
+          </div>
+          <div class="setting-item">
+            <h5>阿里千问</h5>
+            <p>URL: <code>https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions</code></p>
+          </div>
+        </div>
+
+        <div class="setting-section">
+          <h4 class="setting-title">系统Prompt</h4>
+          <textarea id="systemPrompt" class="prompt-textarea" placeholder="输入系统提示词..."></textarea>
+          <div class="prompt-actions">
+            <button id="resetPromptBtn" class="btn-secondary">恢复默认</button>
+            <button id="savePromptBtn" class="btn-primary">保存</button>
+          </div>
+        </div>
+
+        <div class="setting-tip">
+          <strong>提示:</strong> API Key仅保存在本地浏览器中，不会上传到服务器
+        </div>
+      </div>
+    </div>
+  </div>
+          <!-- <p>模型: <code>deepseek-chat</code></p>
+        </div>
+        <div class="setting-item">
+          <h4>阿里千问</h4>
+          <p>URL: <code>https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions</code></p>
+          <p>模型: <code>qwen-plus</code> 或 <code>qwen-turbo</code></p>
+        </div> -->
+        <div class="setting-tip">
+          <strong>提示:</strong> API Key仅保存在本地浏览器中，不会上传到服务器
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
