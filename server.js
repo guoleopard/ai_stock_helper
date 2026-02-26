@@ -36,6 +36,18 @@ async function initDatabase() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  try {
+    db.run(`
+      CREATE TABLE IF NOT EXISTS my_stocks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        stock_code TEXT NOT NULL UNIQUE,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+  } catch (e) {
+    console.log('Table might already exist:', e.message);
+  }
   
   saveDatabase();
 }
@@ -423,6 +435,77 @@ app.get('/api/stock/news', async (req, res) => {
       stockInfo,
       newsUrl
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/stocks', (req, res) => {
+  try {
+    const results = db.exec('SELECT * FROM my_stocks ORDER BY created_at DESC');
+    if (results.length === 0) {
+      return res.json([]);
+    }
+    
+    const columns = results[0].columns;
+    const values = results[0].values;
+    const stocks = values.map(row => {
+      const obj = {};
+      columns.forEach((col, i) => {
+        obj[col] = row[i];
+      });
+      return obj;
+    });
+    
+    res.json(stocks);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/stocks', (req, res) => {
+  const { stockCode } = req.body;
+  
+  console.log('Received stockCode:', stockCode);
+  
+  if (!stockCode) {
+    return res.status(400).json({ error: '缺少股票代码' });
+  }
+  
+  try {
+    const code = stockCode.toLowerCase().replace(/[^0-9]/g, '');
+    let finalCode = code;
+    
+    if (code.startsWith('6')) {
+      finalCode = 'sh' + code;
+    } else if (code.startsWith('0') || code.startsWith('3')) {
+      finalCode = 'sz' + code;
+    } else if (code.length === 5) {
+      finalCode = 'hk' + code;
+    } else if (code.startsWith('8') || code.startsWith('4')) {
+      finalCode = 'bj' + code;
+    } else {
+      finalCode = 'sz' + code;
+    }
+    
+    console.log('Inserting stock:', finalCode);
+    
+    db.run('INSERT OR IGNORE INTO my_stocks (stock_code) VALUES (?)', [finalCode]);
+    saveDatabase();
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error adding stock:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/stocks/:code', (req, res) => {
+  const { code } = req.params;
+  
+  try {
+    db.run('DELETE FROM my_stocks WHERE stock_code = ?', [code]);
+    saveDatabase();
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

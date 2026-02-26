@@ -26,11 +26,98 @@ document.addEventListener('DOMContentLoaded', () => {
   initAnalyzeBtn();
   initStockInput();
   initChatInput();
-  initClearBtn();
+  // initClearBtn(); // 注释掉 - HTML 中没有 clearBtn 元素
   initHistory();
+  initStocks();
   initTabs();
   checkUrlParams();
 });
+
+function initStocks() {
+  loadStocks();
+
+  const addBtn = document.getElementById('addStockBtn');
+  if (addBtn) {
+    addBtn.addEventListener('click', addStock);
+  }
+
+  document.getElementById('stockCodeInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      addStock();
+    }
+  });
+}
+
+async function loadStocks() {
+  try {
+    const response = await fetch('/api/stocks');
+    const stocks = await response.json();
+    renderStocks(stocks);
+  } catch (error) {
+    console.error('加载股票失败:', error);
+  }
+}
+
+function renderStocks(stocks) {
+  const container = document.getElementById('stockList');
+  
+  if (!stocks || stocks.length === 0) {
+    container.innerHTML = '<div class="stock-empty">暂无自选股票</div>';
+    return;
+  }
+  
+  container.innerHTML = stocks.map(item => `
+    <div class="stock-item" data-code="${item.stock_code}">
+      <span class="stock-item-code">${item.stock_code.toUpperCase()}</span>
+      <span class="stock-item-delete" data-code="${item.stock_code}">×</span>
+    </div>
+  `).join('');
+  
+  container.querySelectorAll('.stock-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      if (e.target.classList.contains('stock-item-delete')) return;
+      const code = item.dataset.code;
+      document.getElementById('stockCode').value = code;
+      analyzeStock();
+    });
+  });
+  
+  container.querySelectorAll('.stock-item-delete').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await deleteStock(btn.dataset.code);
+    });
+  });
+}
+
+async function addStock() {
+  const input = document.getElementById('stockCodeInput');
+  const code = input.value.trim();
+
+  if (!code) return;
+
+  try {
+    await fetch('/api/stocks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stockCode: code })
+    });
+    input.value = '';
+    loadStocks();
+  } catch (error) {
+    console.error('添加股票失败:', error);
+    alert('添加失败：' + error.message);
+  }
+}
+
+async function deleteStock(code) {
+  try {
+    await fetch(`/api/stocks/${code}`, { method: 'DELETE' });
+    loadStocks();
+  } catch (error) {
+    console.error('删除股票失败:', error);
+  }
+}
 
 function initTabs() {
   const tabBtns = document.querySelectorAll('.tab-btn');
@@ -137,6 +224,7 @@ const DEFAULT_PROMPT = `你是一位专业的股票分析师，具有10年以上
    - 综合评级
    - 目标价位
    - 风险提示
+   - 后续趋势
 
 请使用专业的金融术语，给出具体的数据和理由。格式要清晰，使用Markdown格式。`;
 

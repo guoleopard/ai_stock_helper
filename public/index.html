@@ -34,6 +34,16 @@
   <main class="main">
     <aside class="history-sidebar">
       <div class="history-header">
+        <h2 class="history-title">我的股票</h2>
+      </div>
+      <div class="stock-add-form">
+        <input type="text" id="stockCodeInput" class="stock-code-input" placeholder="输入股票代码">
+        <button id="addStockBtn" class="add-stock-btn" type="button">+</button>
+      </div>
+      <div class="stock-list" id="stockList">
+        <div class="stock-empty">暂无自选股票</div>
+      </div>
+      <div class="history-header" style="margin-top: auto;">
         <h2 class="history-title">历史记录</h2>
         <button class="clear-history-btn" id="clearHistoryBtn" title="清空历史">清空</button>
       </div>
